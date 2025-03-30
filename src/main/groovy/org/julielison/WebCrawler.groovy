@@ -10,6 +10,7 @@ import com.opencsv.CSVWriter
 
 class WebCrawler {
 	static final Integer QTD_DESDE_A_PRIMEIRA = 4
+	static final PATH = "./Downloads/Aquivos_padrao_TISS/"
 
 	static Document getDocumentForLink(String link) {
 		return Jsoup.connect(link).get()
@@ -44,7 +45,7 @@ class WebCrawler {
 	}
 
 	static void writeInCsv(List<List<String>> dataMapped) {
-		String csvFile = "./Downloads/Histórico das versões dos Componentes do Padrão TISS (desde jan-2016).csv"
+		String csvFile = PATH + "Histórico_das_Versões(desde_jan-2016).csv"
 
 		new FileWriter(csvFile).with { writer ->
 			new CSVWriter(writer).with { csvWriter ->
@@ -55,7 +56,7 @@ class WebCrawler {
 			}
 			writer.close()
 		}
-		println("Dados inseridos com sucesso no arquivo CSV.")
+		println("Dados inseridos com sucesso no arquivo CSV salvo em ")
 	}
 
 	static Document runCommonTask() {
@@ -68,21 +69,27 @@ class WebCrawler {
 		return getDocumentForLink(linkTiss)
 	}
 
-	static void runTask1(Document docPrestadores) {
-		String linkTissMesAno = getLinkContainsText(docPrestadores, 'Clique aqui para acessar a versão Março/2025')
-		Document docTissMesAno = getDocumentForLink(linkTissMesAno)
+	static void runTaskDownload(Document docPrestadores, String linkText1, String linktext2, String fileName) {
+		String link = getLinkContainsText(docPrestadores, linkText1)
+		Document doc = getDocumentForLink(link)
 
-		String linkComponenteZip = getLinkContainsText(docTissMesAno, 'Componente de Comunicação.')
-
-		String saveFilePath = "./Downloads/componente_comunicacao.zip"
-		File file = new File(saveFilePath)
+		String linkFile = getLinkContainsText(doc, linktext2)
+		String pathName = PATH + fileName
+		File file = new File(pathName)
 
 		HttpBuilder.configure {
-			request.uri = linkComponenteZip
+			request.uri = linkFile
 		}.get {
 			Download.toFile(delegate, file)
 		}
-		println("Arquivo baixado com sucesso e salvo em: " + saveFilePath)
+		println("Arquivo baixado com sucesso e salvo em: " + pathName)
+	}
+
+	static void runTask1(Document docPrestadores) {
+		runTaskDownload(docPrestadores,
+				'Clique aqui para acessar a versão ',
+				'Componente de Comunicação.',
+				"componente_comunicacao.zip")
 	}
 
 	static void runTask2(Document docTiss) {
@@ -98,6 +105,10 @@ class WebCrawler {
 		writeInCsv(dataMapped)
 	}
 
-	void runTask3(Document docPrestadores) {
+	static void runTask3(Document docPrestadores){
+		runTaskDownload(docPrestadores,
+				'Clique aqui para acessar as planilhas',
+				'tabela de erros',
+				"tabela_de_erros.xlsx")
 	}
 }
