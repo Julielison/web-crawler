@@ -16,6 +16,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     implementation 'org.jsoup:jsoup:1.19.1'
+    implementation 'com.opencsv:opencsv:5.5.2'
 }
 
 test {

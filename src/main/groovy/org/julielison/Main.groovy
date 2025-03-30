@@ -12,11 +12,7 @@ static void main(String[] args) {
 	String linkEspacoPrestador = wc.getLinkContainsText(docGovAns, 'Espaço do Prestador')
 
 	Document docPrestadores = wc.getDocumentForLink(linkEspacoPrestador)
-	String linkTiss = wc.getLinkContainsText(docPrestadores, 'TISS - Padrão para Troca de Informação de Saúde Suplementar')
-
-	Document docTiss = wc.getDocumentForLink(linkTiss)
-	String linkTissHistorico = wc.getLinkContainsText(docTiss, 'Clique aqui para acessar todas as versões dos Componentes')
-
-	Document docTissHstorico = wc.getDocumentForLink(linkTissHistorico)
-	println(docTissHstorico)
+	wc.runTask1(docPrestadores)
+	wc.runTask2(docPrestadores)
+	wc.runTask3(docPrestadores)
 }
