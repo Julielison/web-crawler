@@ -42,7 +42,7 @@ class WebCrawler {
 	}
 
 	static void writeInCsv(List<List<String>> dataMapped){
-		String csvFile = "./Histórico das versões dos Componentes do Padrão TISS (desde jan-2016).csv"
+		String csvFile = "./Downloads/Histórico das versões dos Componentes do Padrão TISS (desde jan-2016).csv"
 
 		new FileWriter(csvFile).with { writer ->
 			new CSVWriter(writer).with { csvWriter ->
@@ -56,17 +56,24 @@ class WebCrawler {
 		println("Dados inseridos com sucesso no arquivo CSV.")
 	}
 
+	static Document runCommonTask(){
+		Document docGovAns = getDocumentForLink('https://www.gov.br/ans/pt-br')
+		String linkEspacoPrestador = getLinkContainsText(docGovAns, 'Espaço do Prestador')
+
+		Document docPrestadores = getDocumentForLink(linkEspacoPrestador)
+		String linkTiss = getLinkContainsText(docPrestadores, 'TISS - Padrão para Troca de Informação de Saúde Suplementar')
+
+		return getDocumentForLink(linkTiss)
+	}
+
 	void runTask1(Document docPrestadores){
 
 	}
 
-	static void runTask2(Document docPrestadores) {
-		String linkTiss = getLinkContainsText(docPrestadores, 'TISS - Padrão para Troca de Informação de Saúde Suplementar')
-
-		Document docTiss = getDocumentForLink(linkTiss)
+	static void runTask2(Document docTiss) {
 		String linkTissHistorico = getLinkContainsText(docTiss, 'Clique aqui para acessar todas as versões dos Componentes')
-
 		Document docTissHstorico = getDocumentForLink(linkTissHistorico)
+
 		Element headerTable = docTissHstorico.getElementsByTag('tr')[0]
 		Elements headersTh = headerTable.select("th")
 		Elements bodyTrs = docTissHstorico.getElementsByTag('tbody')[0].select('tr')
