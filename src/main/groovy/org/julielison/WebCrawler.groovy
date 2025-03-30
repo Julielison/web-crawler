@@ -47,16 +47,22 @@ class WebCrawler {
 	static void writeInCsv(List<List<String>> dataMapped) {
 		String csvFile = PATH + "Histórico_das_Versões(desde_jan-2016).csv"
 
-		new FileWriter(csvFile).with { writer ->
-			new CSVWriter(writer).with { csvWriter ->
-				dataMapped.each { row ->
-					csvWriter.writeNext(row as String[])
+		try {
+			new FileWriter(csvFile).with { FileWriter writer ->
+				new CSVWriter(writer).with { CSVWriter csvWriter ->
+					dataMapped.each { List<String> row ->
+						csvWriter.writeNext(row as String[])
+					}
+					csvWriter.close()
 				}
-				csvWriter.close()
+				writer.close()
 			}
-			writer.close()
+
+		} catch (IOException e){
+			println("Erro ao escrever no arquivo CSV: $csvFile")
+			println("Erro: + $e.message")
 		}
-		println("Dados inseridos com sucesso no arquivo CSV salvo em ")
+		println("Dados inseridos com sucesso no arquivo CSV salvo em $csvFile")
 	}
 
 	static Document runCommonTask() {
@@ -69,20 +75,25 @@ class WebCrawler {
 		return getDocumentForLink(linkTiss)
 	}
 
-	static void runTaskDownload(Document docPrestadores, String linkText1, String linktext2, String fileName) {
+	static void runTaskDownload(Document docPrestadores, String linkText1, String linkText2, String fileName) {
 		String link = getLinkContainsText(docPrestadores, linkText1)
 		Document doc = getDocumentForLink(link)
 
-		String linkFile = getLinkContainsText(doc, linktext2)
+		String linkFile = getLinkContainsText(doc, linkText2)
 		String pathName = PATH + fileName
 		File file = new File(pathName)
 
-		HttpBuilder.configure {
-			request.uri = linkFile
-		}.get {
-			Download.toFile(delegate, file)
+		try {
+			HttpBuilder.configure {
+				request.uri = linkFile
+			}.get {
+				Download.toFile(delegate, file)
+			}
+			println("Arquivo baixado com sucesso e salvo em: $pathName")
+		} catch (Exception e) {
+			println("Erro ao baixar o arquivo: $pathName")
+			println("Erro: $e.message")
 		}
-		println("Arquivo baixado com sucesso e salvo em: " + pathName)
 	}
 
 	static void runTask1(Document docPrestadores) {
